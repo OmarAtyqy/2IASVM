@@ -1,21 +1,87 @@
 import numpy as np
+from kernels import *
 
 
-# helper function
-def f(alpha, y, X, x, b):
-    return np.sum(alpha * y * np.dot(X, x.T)) + b
-
-# prediction function
-def predict(alpha, y, X, x, b):
-    if f(alpha, y, X, x, b) >= 0:
-        return 1
-    else:
-        return -1
-
-# support vector machine algorithm
-def SVM(X, y, C=1, tol=1e-3, max_passes=5):
+# support vector machine algorithm for binary classification
+def SVM(X, y, C=1, tol=1e-3, max_passes=10, kernel=linear_kernel):
     """
     Support vector machine algorithm
+    Args:
+        X: data points
+        y: labels
+        C: regularization parameter
+        tol: tolerance
+        max_passes: maximum number of passes
+        kernel: kernel function to use
+    Returns:
+        w: weights
+        b: bias
+    """
+    m, n = X.shape
+    alphas = np.zeros(m)
+    b = 0
+    passes = 0
+    
+    while passes < max_passes:
+        num_changed_alphas = 0
+        
+        for i in range(m):
+            Ei = np.dot(alphas*y, kernel(X, X[i])) + b - y[i]
+            
+            if ((y[i]*Ei < -tol and alphas[i] < C) or (y[i]*Ei > tol and alphas[i] > 0)):
+                j = np.random.choice(list(range(i)) + list(range(i+1, m)))
+                Ej = np.dot(alphas*y, kernel(X, X[j])) + b - y[j]
+                
+                alpha_i_old, alpha_j_old = alphas[i], alphas[j]
+                
+                if y[i] == y[j]:
+                    L = max(0, alphas[j] + alphas[i] - C)
+                    H = min(C, alphas[j] + alphas[i])
+                else:
+                    L = max(0, alphas[j] - alphas[i])
+                    H = min(C, C + alphas[j] - alphas[i])
+                
+                if L == H:
+                    continue
+                
+                eta = 2 * kernel(X[i], X[j]) - kernel(X[i], X[i]) - kernel(X[j], X[j])
+                
+                if eta >= 0:
+                    continue
+                
+                alphas[j] -= (y[j] * (Ei - Ej)) / eta
+                alphas[j] = max(L, min(H, alphas[j]))
+                
+                if abs(alphas[j] - alpha_j_old) < tol:
+                    alphas[j] = alpha_j_old
+                    continue
+                
+                alphas[i] += y[i]*y[j]*(alpha_j_old - alphas[j])
+                
+                b1 = b - Ei - y[i]*(alphas[i]-alpha_i_old)*kernel(X[i], X[i]) - y[j]*(alphas[j]-alpha_j_old)*kernel(X[i], X[j])
+                b2 = b - Ej - y[i]*(alphas[i]-alpha_i_old)*kernel(X[i], X[j]) - y[j]*(alphas[j]-alpha_j_old)*kernel(X[j], X[j])
+                
+                if 0 < alphas[i] < C:
+                    b = b1
+                elif 0 < alphas[j] < C:
+                    b = b2
+                else:
+                    b = (b1 + b2) / 2
+                
+                num_changed_alphas += 1
+                
+        if num_changed_alphas == 0:
+            passes += 1
+        else:
+            passes = 0
+    
+    W = np.dot(alphas * y, X)
+    return W, b
+
+# support vector machine algorithm for multi class classification using one vs one method
+def SVM_One_vs_One(X, y, C=1, tol=1e-3, max_passes=5):
+    """
+    Support vector machine algorithm for multi class classification using one vs one method
     Args:
         X: data points
         y: labels
@@ -27,66 +93,21 @@ def SVM(X, y, C=1, tol=1e-3, max_passes=5):
         b: bias
     """
     n = len(X)
-    alpha = np.zeros(shape=(n, 1))
-    b = 0
-    passes = 0
+    classes = np.unique(y)
+    num_classes = len(classes)
+    alpha = []
+    b = []
 
-    while passes < max_passes:
-        num_changed_alphas = 0
-        for i in range(n):
-            E_i = f(alpha, y, X, X[i], b) - y[i]
-            if (y[i]*E_i < -tol and alpha[i] < C) or (y[i]*E_i > tol and alpha[i] > 0):
-                j = np.random.randint(0, n)
-                while j == i:
-                    j = np.random.randint(0, n)
-                E_j = f(alpha, y, X, X[j], b) - y[j]
-                old_alpha_i = alpha[i]
-                old_alpha_j = alpha[j]
+    for i in range(num_classes):
+        for j in range(i + 1, num_classes):
+            idx = np.where((y == classes[i]) | (y == classes[j]))[0]
+            X_i = X[idx]
+            y_i = y[idx]
+            y_i[y_i == classes[i]] = 1
+            y_i[y_i == classes[j]] = -1
+            w, b_i = SVM(X_i, y_i, C, tol, max_passes)
 
-                if y[i] != y[j]:
-                    L = max(0, alpha[j] - alpha[i])
-                    H = min(C, C + alpha[j] - alpha[i])
-                else:
-                    L = max(0, alpha[i] + alpha[j] - C)
-                    H = min(C, alpha[i] + alpha[j])
-                
-                if L == H:
-                    continue
+            alpha.append(w)
+            b.append(b_i)
 
-                eta = 2 * np.dot(X[i], X[j]) - np.dot(X[i], X[i]) - np.dot(X[j], X[j])
-
-                if eta >= 0:
-                    continue
-                    
-                alpha[j] -= y[j] * (E_i - E_j) / eta
-                if alpha[j] > H:
-                    alpha[j] = H
-                elif alpha[j] < L:
-                    alpha[j] = L
-
-                if abs(alpha[j] - old_alpha_j) < 1e-10:
-                    continue
-                    
-                alpha[i] += y[i] * y[j] * (old_alpha_j - alpha[j])
-
-                b1 = b - E_i - y[i] * (alpha[i] - old_alpha_i) * np.dot(X[i], X[i]) - y[j] * (alpha[j] - old_alpha_j) * np.dot(X[i], X[j])
-                b2 = b - E_j - y[i] * (alpha[i] - old_alpha_i) * np.dot(X[i], X[j]) - y[j] * (alpha[j] - old_alpha_j) * np.dot(X[j], X[j])
-
-                if 0 < alpha[i] < C:
-                    b = b1
-                elif 0 < alpha[j] < C:
-                    b = b2
-                else:
-                    b = (b1 + b2) / 2
-                
-                num_changed_alphas += 1
-            
-        if num_changed_alphas == 0:
-            passes += 1
-        else:
-            passes = 0
-    
-    # transform alpha to w
-    w = np.sum(alpha * y.reshape(n, 1) * X, axis=0)
-
-    return w, b
+    return alpha, b

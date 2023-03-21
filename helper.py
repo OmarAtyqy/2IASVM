@@ -1,6 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+# helper function
+def f(alpha, y, X, x, b):
+    return np.sum(alpha * y * np.dot(X, x.T)) + b
+
+# prediction function
+def predict(alpha, y, X, x, b):
+    if f(alpha, y, X, x, b) >= 0:
+        return 1
+    else:
+        return -1
+
 # generate linearly sperated data
 def generate_linear_seperable_data(n):
     """
@@ -82,8 +94,8 @@ def generate_multi_class_data(n):
         X.append([x1, x2])
         y.append(2)
 
-        x1 = np.random.uniform(1, 4)
-        x2 = np.random.uniform(0, 10)
+        x1 = np.random.uniform(5, 9)
+        x2 = np.random.uniform(-10, -20)
         X.append([x1, x2])
         y.append(3)
     
@@ -91,7 +103,7 @@ def generate_multi_class_data(n):
 
 
 # plot data
-def plot_data(X, y, seperator = None):
+def plot_data(X, y, seperators = None):
     """
     Plot 2D data
     Args:
@@ -109,15 +121,16 @@ def plot_data(X, y, seperator = None):
         elif y[index] == 3:
             plt.scatter(point[0], point[1], color='yellow')
     
-    if seperator != None:
-        w1, w2 = seperator[0]
-        w0 = seperator[1]
+    if seperators != None:
+        for separator in seperators:
+            w1, w2 = separator[0]
+            w0 = separator[1]
 
-        slope = -w1 / w2
-        intercept = -w0 / w2
+            slope = -w1 / w2
+            intercept = -w0 / w2
 
-        x = np.linspace(0, 12, 100)
-        y = slope * x + intercept
-        plt.plot(x, y, color='black')   
+            x = np.linspace(0, 12, 100)
+            y = slope * x + intercept
+            plt.plot(x, y, color='black') 
 
     plt.show()
