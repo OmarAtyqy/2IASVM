@@ -111,3 +111,32 @@ def SVM_One_vs_One(X, y, C=1, tol=1e-3, max_passes=5, kernel=linear_kernel):
             b.append(b_i)
 
     return alpha, b
+
+# support vector machine algorithm for multi class classification using one vs all method
+def SVM_One_vs_All(X, y, C=1, tol=1e-3, max_passes=5, kernel=linear_kernel):
+    """
+    Support vector machine algorithm for multi class classification using one vs all method
+    Args:
+        X: data points
+        y: labels
+        C: regularization parameter
+        tol: tolerance
+        max_passes: maximum number of passes
+    Returns:
+        w: weights
+        b: bias
+    """
+    n = len(X)
+    classes = np.unique(y)
+    num_classes = len(classes)
+    alpha = []
+    b = []
+
+    for i in range(num_classes):
+        y_i = np.where(y == classes[i], 1, -1)
+        w, b_i = SVM(X, y_i, C, tol, max_passes, kernel=kernel)
+
+        alpha.append(w)
+        b.append(b_i)
+
+    return alpha, b
