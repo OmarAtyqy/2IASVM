@@ -2,17 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# helper function
-def f(alpha, y, X, x, b):
-    return np.sum(alpha * y * np.dot(X, x.T)) + b
-
-# prediction function
-def predict(alpha, y, X, x, b):
-    if f(alpha, y, X, x, b) >= 0:
-        return 1
-    else:
-        return -1
-
 # generate linearly sperated data
 def generate_linear_seperable_data(n):
     """

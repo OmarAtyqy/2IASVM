@@ -1,5 +1,5 @@
 import numpy as np
-from kernels import *
+from .kernels import *
 
 
 # support vector machine algorithm for binary classification
@@ -79,7 +79,7 @@ def SVM(X, y, C=1, tol=1e-3, max_passes=10, kernel=linear_kernel):
     return W, b
 
 # support vector machine algorithm for multi class classification using one vs one method
-def SVM_One_vs_One(X, y, C=1, tol=1e-3, max_passes=5):
+def SVM_One_vs_One(X, y, C=1, tol=1e-3, max_passes=5, kernel=linear_kernel):
     """
     Support vector machine algorithm for multi class classification using one vs one method
     Args:
@@ -105,7 +105,7 @@ def SVM_One_vs_One(X, y, C=1, tol=1e-3, max_passes=5):
             y_i = y[idx]
             y_i[y_i == classes[i]] = 1
             y_i[y_i == classes[j]] = -1
-            w, b_i = SVM(X_i, y_i, C, tol, max_passes)
+            w, b_i = SVM(X_i, y_i, C, tol, max_passes, kernel=kernel)
 
             alpha.append(w)
             b.append(b_i)
