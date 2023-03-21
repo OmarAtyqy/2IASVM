@@ -59,6 +59,36 @@ def generate_non_linear_seperable_data(n):
     
     return np.array(one_x + minus_one_x), np.array(one_y + minus_one_y)
 
+# generate multi class data
+def generate_multi_class_data(n):
+    """
+    Generate multi class 2D data labeled as either 1, 2, or 3
+    Args:
+        n: number of data points
+    Returns:
+        X: data points
+        y: labels
+    """
+    X = []
+    y = []
+    for _ in range(n):
+        x1 = np.random.uniform(1, 4)
+        x2 = np.random.uniform(-30, -20)
+        X.append([x1, x2])
+        y.append(1)
+
+        x1 = np.random.uniform(8, 11)
+        x2 = np.random.uniform(0, 10)
+        X.append([x1, x2])
+        y.append(2)
+
+        x1 = np.random.uniform(1, 4)
+        x2 = np.random.uniform(0, 10)
+        X.append([x1, x2])
+        y.append(3)
+    
+    return np.array(X), np.array(y)
+
 
 # plot data
 def plot_data(X, y, seperator = None):
@@ -72,8 +102,12 @@ def plot_data(X, y, seperator = None):
     for index, point in enumerate(X):
         if y[index] == 1:
             plt.scatter(point[0], point[1], color='blue')
-        else:
+        elif y[index] == -1:
             plt.scatter(point[0], point[1], color='red')
+        elif y[index] == 2:
+            plt.scatter(point[0], point[1], color='green')
+        elif y[index] == 3:
+            plt.scatter(point[0], point[1], color='yellow')
     
     if seperator != None:
         w1, w2 = seperator[0]

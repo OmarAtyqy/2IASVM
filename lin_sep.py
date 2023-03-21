@@ -5,7 +5,7 @@ from helper import *
 X, y = generate_linear_seperable_data(100)
 
 # run SVM
-w, b = SVM(X, y, C=0.1, tol=1e-3, max_passes=5)
+w, b = SVM(X, y, C=1, tol=1e-3, max_passes=5)
 
 # plot data
 seperator = [w, b]
