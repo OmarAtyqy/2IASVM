@@ -74,19 +74,19 @@ def generate_multi_class_data(n):
     y = []
     for _ in range(n):
         x1 = np.random.uniform(1, 4)
-        x2 = np.random.uniform(-30, -20)
+        x2 = np.random.uniform(-2, 0)
+        X.append([x1, x2])
+        y.append(0)
+
+        x1 = np.random.uniform(6, 9)
+        x2 = np.random.uniform(6, 9)
         X.append([x1, x2])
         y.append(1)
 
-        x1 = np.random.uniform(8, 11)
-        x2 = np.random.uniform(0, 10)
+        x1 = np.random.uniform(0, 3)
+        x2 = np.random.uniform(7, 9)
         X.append([x1, x2])
         y.append(2)
-
-        x1 = np.random.uniform(3, 8)
-        x2 = np.random.uniform(-10, -20)
-        X.append([x1, x2])
-        y.append(3)
     
     return np.array(X), np.array(y)
 
@@ -101,14 +101,12 @@ def plot_data(X, y, seperators = None):
         seperator: array where seperator[0] is the slope and seperator[1] is the y-intercept
     """
     for index, point in enumerate(X):
-        if y[index] == 1:
+        if y[index] == 0:
             plt.scatter(point[0], point[1], color='blue')
-        elif y[index] == -1:
+        elif y[index] == 1:
             plt.scatter(point[0], point[1], color='red')
         elif y[index] == 2:
             plt.scatter(point[0], point[1], color='green')
-        elif y[index] == 3:
-            plt.scatter(point[0], point[1], color='yellow')
     
     if seperators != None:
         for separator in seperators:
@@ -118,8 +116,11 @@ def plot_data(X, y, seperators = None):
             slope = -w1 / w2
             intercept = -w0 / w2
 
-            x = np.linspace(0, 12, 100)
+            x = np.linspace(0, 9, 100)
             y = slope * x + intercept
             plt.plot(x, y, color='black') 
+
+    # limt the y axis to the min and max y values
+    plt.ylim(min(X[:, 1]) - 1, max(X[:, 1]) + 1) 
 
     plt.show()
