@@ -1,5 +1,5 @@
-from CODE.SVM import *
-from CODE.helper import *
+from src.SVM import *
+from src.helper import *
 
 # generate linearly sperated data
 X, y = generate_linear_seperable_data(100)
