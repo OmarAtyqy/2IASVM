@@ -1,5 +1,6 @@
 from src.SVM import SVM_One_vs_One
 from src.helper import *
+from src.kernels import *
 
 # generate multi class data
 X, y = generate_multi_class_data(100)

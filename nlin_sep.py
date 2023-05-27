@@ -1,5 +1,6 @@
-from CODE.SVM import *
-from CODE.helper import *
+from src.SVM import *
+from src.helper import *
+from src.kernels import *
 
 # generate non linearly sperated data
 X, y = generate_non_linear_seperable_data(100)

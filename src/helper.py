@@ -47,7 +47,7 @@ def generate_non_linear_seperable_data(n):
         one_x.append([x1, x2])
         one_y.append(1)
 
-        x1 = np.random.uniform(8, 11)
+        x1 = np.random.uniform(3, 11)
         x2 = np.random.uniform(0, 10)
         minus_one_x.append([x1, x2])
         minus_one_y.append(-1)
@@ -83,7 +83,7 @@ def generate_multi_class_data(n):
         X.append([x1, x2])
         y.append(2)
 
-        x1 = np.random.uniform(5, 9)
+        x1 = np.random.uniform(3, 8)
         x2 = np.random.uniform(-10, -20)
         X.append([x1, x2])
         y.append(3)

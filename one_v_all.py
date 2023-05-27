@@ -1,5 +1,6 @@
-from CODE.SVM import *
-from CODE.helper import *
+from src.SVM import *
+from src.helper import *
+import src.kernels as kernels
 
 # generate multi class data
 X, y = generate_multi_class_data(100)

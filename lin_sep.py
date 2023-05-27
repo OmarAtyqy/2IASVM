@@ -1,5 +1,6 @@
 from src.SVM import *
 from src.helper import *
+from src.kernels import *
 
 # generate linearly sperated data
 X, y = generate_linear_seperable_data(100)
